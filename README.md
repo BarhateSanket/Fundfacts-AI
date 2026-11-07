@@ -68,7 +68,7 @@ Fundfacts-AI/
 Download or clone the repository and open:
 
 ```text
-mf-faq-prototype.html
+index.html
 ```
 
 The application runs directly in a modern browser.
