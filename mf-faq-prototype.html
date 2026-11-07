@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Mutual Fund Facts FAQ: ICICI Prudential (Groww Track)</title>
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1d1d1f;--mut:#6b6b70;--card:#f3f3f5;--acc:#0b6e4f;--line:#d9d9de;--warn:#8a5a00}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--fg:#f2f2f4;--mut:#9a9aa2;--card:#202024;--acc:#4fd1a5;--line:#303036;--warn:#f0c060}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));min-height:100vh;display:flex;flex-direction:column}
+small{color:var(--mut)}
+h1{font-size:18px;margin:4px 0 6px}
+p{margin:0 0 8px}
+.note{font-size:13px;color:var(--mut);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.chips button{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:16px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+#chat{flex:1;display:flex;flex-direction:column;gap:12px;padding:8px 0}
+.msg{padding:10px 12px;border-radius:10px;max-width:94%;white-space:pre-wrap;overflow-wrap:anywhere}
+.bot{background:var(--card);align-self:flex-start}
+.me{background:var(--acc);color:#fff;align-self:flex-end}
+.hd{font-weight:600;font-size:13px;color:var(--mut);margin-bottom:2px}
+.src{font-size:12.5px;color:var(--mut);margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
+.src a{color:var(--acc)}
+.warn{color:var(--warn);font-weight:600}
+form{display:flex;gap:8px;position:sticky;bottom:0;background:var(--bg);padding:8px 0}
+input{flex:1;min-width:0;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-family:inherit;font-size:16px}
+.send{padding:10px 14px;border:0;border-radius:8px;background:var(--acc);color:#fff;font:inherit;cursor:pointer}
+.send:disabled{opacity:.6;cursor:default}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<small>Educational project (Groww track). Not affiliated with Groww or ICICI Prudential AMC.</small>
+<h1>Mutual Fund Facts FAQ: ICICI Prudential</h1>
+<p>Welcome! Ask a factual question about the ICICI Prudential Large Cap, Flexi Cap or ELSS Tax Saver Fund.</p>
+<div class="note"><strong>Facts-only. No investment advice.</strong> Answers come only from the approved official documents shown with each answer. Please don’t share personal details such as PAN, Aadhaar, account, phone, email or OTP numbers. Pattern checks can’t catch every format.</div>
+<div id="ex" class="chips"></div>
+<div id="chat" role="log" aria-live="polite" aria-label="Conversation"></div>
+<form id="f" autocomplete="off">
+<label for="q" class="sr">Ask a factual question about the supported funds</label>
+<input id="q" name="q" type="text" maxlength="300" placeholder="Ask a factual question" spellcheck="false" autocomplete="off" enterkeyhint="send">
+<button class="send" id="go" type="submit">Ask</button>
+</form>
+</main>
+
+<script id="core">
+"use strict";
+var Core = (function () {
+  var VERIFIED_ISO = "2026-11-07", VERIFIED = "7 Nov 2026", STALE_DAYS = 45;
+
+  // Source register. docDate = date printed in the document. asOf = data date (ISO), null if undated.
+  // verified = date this build inspected the source; null if the page was never opened.
+  var SRC = {
+    bluebook: { url: "https://www.icicipruamc.com/blob/knowledgecentre/bluebooks-equity/Equity.pdf", title: "ICICI Prudential Equity Schemes Bluebook", docDate: "October 2026 (data as on 30 Sep 2026)", asOf: "2026-09-30", verified: VERIFIED, status: "opened and read" },
+    onePager: { url: "https://www.icicipruamc.com/blob/knowledgecentre/product-enabler/9356-IPru%20Mutual%20Fund-Bluechip%20Fund%20Investor%20Mobile%20Vr-March%2025-linked.pdf", title: "ICICI Prudential Bluechip Fund investor one-pager", docDate: "March 2025 (data as on 31 Mar 2025)", asOf: "2025-03-31", verified: VERIFIED, status: "opened and read" },
+    elss: { url: "https://www.icicipruamc.com/blob/knowledgecentre/factsheet-schemes/Schemes/1.%20Equity%20Schemes/ICICI%20Prudential%20ELSS%20-%20Tax%20Saver%20Fund.pdf", title: "ICICI Prudential ELSS Tax Saver Fund factsheet", docDate: "NAV as on 31 Aug 2026", asOf: "2026-08-31", verified: VERIFIED, status: "text read from search result" },
+    amfi: { url: "https://portal.amfiindia.com/spages/SSD_3445.pdf", title: "AMFI scheme data sheet SSD 3445", docDate: "not stated in document", asOf: null, verified: VERIFIED, status: "text read from search result" },
+    ter: { url: "https://www.icicipruamc.com/about-us/financials-&-disclosures?currentTabFilter=Total+Expense+Ratio&subCatTabFilter=Total+Expense+Ratio", title: "ICICI Prudential AMC Total Expense Ratio disclosures page", docDate: "not verified", asOf: null, verified: null, status: "linked from factsheet, not opened" }
+  };
+  var ALLOWED_HOSTS = ["www.icicipruamc.com", "portal.amfiindia.com"];
+
+  // Warning shown with a source: undated, dated (older than STALE_DAYS), or never opened.
+  function warningFor(src) {
+    if (!src) return null;
+    if (src.verified === null) return "This link was not opened, so its content is not verified.";
+    if (!src.asOf) return "Undated source: confirm this figure is current before relying on it.";
+    var days = Math.round((Date.parse(VERIFIED_ISO) - Date.parse(src.asOf)) / 86400000);
+    return days > STALE_DAYS ? "Dated source: the data is " + days + " days older than the verification date, so figures may be out of date." : null;
+  }
+
+  // Terms are compared with spaces removed; short terms must match exactly (see maxDist).
+  var SCHEMES = [
+    { id: "LCF", name: "ICICI Prudential Large Cap Fund (formerly Bluechip Fund)", terms: ["largecap", "bluechip", "lcf"] },
+    { id: "FLEXI", name: "ICICI Prudential Flexi Cap Fund (formerly Flexicap Fund)", terms: ["flexicap", "flexi"] },
+    { id: "ELSS", name: "ICICI Prudential ELSS Tax Saver Fund", terms: ["elss", "taxsaver", "taxsaving"] }
+  ];
+  var TOPICS = [
+    { id: "exp", label: "Expense ratio", terms: ["expenseratio", "expense", "ter"] },
+    { id: "exit", label: "Exit load", terms: ["exitload", "exit", "redemptionload"] },
+    { id: "sip", label: "Minimum SIP", terms: ["minimumsip", "minsip", "sip", "sipamount"] },
+    { id: "lock", label: "Lock-in period", terms: ["lockin", "lock", "lockinperiod"] },
+    { id: "risk", label: "Riskometer", terms: ["riskometer", "riskometre", "risk"] },
+    { id: "bench", label: "Benchmark", terms: ["benchmark", "benchmarks", "benchmarked"] },
+    { id: "start", label: "Inception date", terms: ["inception", "launch", "launched", "incepted", "started", "start", "startdate"] },
+    { id: "mgr", label: "Fund managers", terms: ["manager", "managers", "runs", "runby", "handles"] },
+    { id: "stmt", label: "Statements", terms: ["statement", "statements", "capitalgain", "capitalgains", "cas"] }
+  ];
+
+  // Approved facts only. kind: fact | partial | abstain. src: SRC key or null.
+  var FACTS = {
+    LCF: {
+      exp: { kind: "fact", text: "The total expense ratio was 0.89% per annum for the Direct plan and 1.41% per annum for Other plans, as on 31 March 2025, according to the AMC one-pager. These figures are historical, so current ratios may be different.", src: "onePager" },
+      exit: { kind: "fact", text: "Exit load is 1% of applicable NAV if redeemed within 1 month from allotment, and nil after 1 month.", src: "bluebook" },
+      sip: { kind: "fact", text: "The minimum SIP amount is ₹100, according to the AMFI scheme data sheet.", src: "amfi" },
+      lock: { kind: "fact", text: "The Bluebook describes a 3-year statutory lock-in only for the ELSS Tax Saver scheme. It lists the Large Cap Fund under large cap funds and does not describe a lock-in for it.", src: "bluebook" },
+      risk: { kind: "fact", text: "The AMC one-pager, dated March 2025, states that the risk of the scheme is very high. The riskometer is reviewed monthly, so the current level may differ.", src: "onePager" },
+      bench: { kind: "fact", text: "The benchmark is Nifty 100 TRI.", src: "bluebook" },
+      start: { kind: "fact", text: "Inception was 23 May 2008. The scheme was renamed from Bluechip Fund to Large Cap Fund effective 16 June 2025.", src: "bluebook" },
+      mgr: { kind: "fact", text: "Sankaran Naren, Vaibhav Dusad and Sharmila D’Silva are listed as fund managers, effective 2 March 2026.", src: "bluebook" }
+    },
+    FLEXI: {
+      exp: { kind: "abstain", text: "I can’t confirm this scheme’s expense ratio from an approved source yet, so I won’t give a figure. The AMC’s expense ratio disclosures page is linked below, but I haven’t opened it.", src: "ter" },
+      exit: { kind: "fact", text: "Exit load is 1% of applicable NAV if redeemed within 1 month from allotment, and nil after 1 month.", src: "bluebook" },
+      sip: { kind: "abstain", text: "I can’t confirm this scheme’s minimum SIP from an approved source yet, so I won’t guess.", src: null },
+      lock: { kind: "partial", text: "The Bluebook describes a 3-year statutory lock-in for the ELSS Tax Saver scheme. It does not describe a lock-in for the Flexi Cap Fund, so I can’t confirm this scheme’s lock-in terms from it.", src: "bluebook" },
+      risk: { kind: "partial", text: "The Bluebook lists riskometers as on 30 September 2026, but this scheme’s level was not readable in the text I checked. Please check the AMC’s riskometer announcements for the current level.", src: "bluebook" },
+      bench: { kind: "fact", text: "The benchmark is BSE 500 TRI.", src: "bluebook" },
+      start: { kind: "fact", text: "Inception was 17 July 2021. The scheme was renamed from Flexicap Fund to Flexi Cap Fund effective 26 August 2026.", src: "bluebook" },
+      mgr: { kind: "fact", text: "Rajat Chandak is listed as the fund manager.", src: "bluebook" }
+    },
+    ELSS: {
+      exp: { kind: "fact", text: "The base expense ratio is 0.96% per annum for the Direct plan and 1.46% per annum for Other plans, as shown in the factsheet with NAV as on 31 August 2026.", src: "elss" },
+      exit: { kind: "fact", text: "Exit load is nil, according to the Bluebook. The scheme also has a statutory lock-in of 3 years.", src: "bluebook" },
+      sip: { kind: "abstain", text: "I can’t confirm this scheme’s minimum SIP from an approved source yet, so I won’t guess.", src: null },
+      lock: { kind: "fact", text: "The scheme has a statutory lock-in of 3 years. The Bluebook says its tax benefit under Section 80C applies to investors who opt for the old tax regime.", src: "bluebook" },
+      risk: { kind: "partial", text: "The Bluebook lists riskometers as on 30 September 2026, but this scheme’s level was not readable in the text I checked. Please check the AMC’s riskometer announcements for the current level.", src: "bluebook" },
+      bench: { kind: "fact", text: "The benchmark is Nifty 500 TRI.", src: "bluebook" },
+      start: { kind: "fact", text: "Inception was 19 August 1999.", src: "bluebook" },
+      mgr: { kind: "fact", text: "Mittul Kalawadia and Priyanka Khandelwal are listed as fund managers, effective 2 March 2026.", src: "bluebook" }
+    }
+  };
+
+  var MSG = {
+    empty: "Please type a question first.",
+    tooLong: "Please keep your question under 300 characters.",
+    privacy: "I didn’t process that message because it looks like personal details. Pattern checks can’t catch every format, so please don’t share PAN, Aadhaar, account, phone, email or OTP details here.",
+    injection: "I can only answer factual questions about the three supported schemes, and I can’t change my instructions.",
+    opinion: "I can only share facts, so I can’t say whether to buy, sell or hold, or whether any scheme suits you. The Bluebook explains these scheme categories, and a SEBI-registered investment adviser can help with personal decisions.",
+    compare: "I can’t rank or compare schemes, or compare their returns. Ask for one fact about each scheme and I’ll answer them one by one.",
+    returns: "I can’t predict or calculate returns. The one-pager’s performance table is dated March 2025, so treat it only as historical reference.",
+    otp: "I can’t explain OTPs from my approved sources. For your safety, never share an OTP with anyone.",
+    needScheme: "Which scheme do you mean: Large Cap Fund, Flexi Cap Fund or ELSS Tax Saver Fund?",
+    otherScheme: "I only cover ICICI Prudential Large Cap, Flexi Cap and ELSS Tax Saver funds, so I can’t answer for other schemes or fund houses.",
+    unsupported: "I don’t have an approved answer for that. I can answer about: expense ratio, exit load, minimum SIP, lock-in period, riskometer, benchmark, inception date and fund managers.",
+    outOfScope: "I can only answer about the ICICI Prudential Large Cap, Flexi Cap and ELSS Tax Saver funds, and the details listed above.",
+    tooMany: "That’s too many scheme and detail combinations at once. Please ask about up to four at a time.",
+    stmt: "I can’t confirm statement-download steps from an approved source, so I won’t give them.",
+    abstainDefault: "I can’t verify that from an approved source, so I won’t guess."
+  };
+
+  // ---- Input preparation: Unicode compatibility form, zero-width characters removed. ----
+  function prep(s) { return String(s == null ? "" : s).normalize("NFKC").replace(/[\u200B-\u200D\u2060\uFEFF\u00AD]/g, ""); }
+
+  // ---- Privacy: pattern-based only. Never displays, stores, logs or sends the matched text. ----
+  var PII = [
+    /[A-Za-z]{5}[\s._-]?\d{4}[\s._-]?[A-Za-z]/,                                       // PAN-like, separators allowed
+    /(?<!\d)[2-9]\d{3}[\s._-]?\d{4}[\s._-]?\d{4}(?!\d)/,                        // Aadhaar-like (12 digits)
+    /(?<!\d)(?:\+?91[\s()._-]*)?[6-9]\d{4}[\s()._-]*\d{5}(?!\d)/,             // Indian mobile-like
+    /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/,                       // email-like
+    /\w+\s*(?:\[at\]|\(at\)|\sat\s)\s*\w+\s*(?:\[dot\]|\(dot\)|\sdot\s)\s*[a-z]{2,}/i, // obfuscated email
+    /(?<!\d)\d{9,18}(?!\d)/,                                                // account-like, contiguous
+    /(?<!\d)\d{4}(?:[\s._-]\d{3,4}){2,4}(?!\d)/,                              // card/account-like, grouped
+    /\b(?:otp|one[\s-]?time (?:password|passcode|code|pin)|verification code|passcode)\b[^\n]{0,30}?(?<!\d)\d{4,8}(?!\d)/i,
+    /(?<!\d)\d{4,8}(?!\d)[^\n]{0,30}?\b(?:otp|one[\s-]?time (?:password|passcode|code)|verification code|passcode)\b/i
+  ];
+  function isSensitive(q) { var s = prep(q); return PII.some(function (re) { return re.test(s); }); }
+
+  // ---- Intent patterns, applied to normalized text (lower case, letters and digits only). ----
+  var INJECT = /\b(?:ignore|disregard|forget|reset)\b.{0,30}\b(?:instructions?|rules|prompt|above)\b|system (?:prompt|message)|developer (?:message|mode)|you are now|\bact as\b|\bpretend\b|\broleplay\b|role ?play|jailbreak|\byour (?:system |hidden |original )?(?:prompt|instructions)\b|\b(?:print|show|reveal|repeat|share|tell me|give me|disclose|display) (?:me )?(?:your|the) (?:system |hidden )?(?:prompt|instructions|rules)\b/;
+  var OPINION = [
+    /\bshould (?:i|we) (?:buy|sell|hold|invest|exit|redeem|switch|stay|put|start|stop|continue|add|withdraw|pick|choose|select|use|go)\b/,
+    /\bshall i (?:buy|sell|hold|invest|exit|redeem|switch|stay|put|start|stop|continue|add|withdraw|pick|choose|select|use|go)\b/,
+    /\b(?:recommend|recommendation|suggest|suggestion|advise|advice|best|predict|prediction|forecast)\b/,
+    /\bworth (?:it|investing|buying)\b/,
+    /\b(?:good|bad|right|ideal|smart|wise) (?:time|moment|buy|choice|decision|idea)\b/,
+    /\b(?:is|are) (?:it|this|that|they|the .{0,25}) (?:a |an )?(?:good|bad|safe|risky|suitable|right|smart|wise)\b/,
+    /\b(?:buy|sell|hold|redeem|exit|invest|switch)\b.{0,12}\b(?:or|vs)\b.{0,12}\b(?:buy|sell|hold|redeem|exit|invest|switch)\b/,
+    /\b(?:buy|sell|hold|redeem|exit|invest|switch) (?:now|today|tomorrow|this (?:month|week|year))\b/,
+    /\bgood (?:buy|investment|option)\b/,
+    /\b(?:is|are) .{0,30}\b(?:suitable|good|bad|safe|risky|right) (?:for|to) (?:me|us|my|a|an)\b/
+  ];
+  var COMPARE = /\b(?:vs|versus|compare|comparison|compared|better|outperform|beat|difference between)\b/;
+  var RETURNS = [
+    /\b(?:returns?|cagr|xirr|performance|profit)\b/,
+    /\bhow much\b.{0,25}\b(?:make|earn|get back|gain|grow)\b/,
+    /\bwill\b.{0,40}\b(?:grow|rise|fall|go up|go down|increase|decrease|give|earn|make|beat|outperform|crash|double)\b/
+  ];
+  // Other fund houses and categories this app does not cover. Checked before scheme matching.
+  var OTHER_SCHEME = /\b(?:hdfc|sbi|axis|nippon|mirae|kotak|dsp|parag|quant|franklin|uti|aditya|birla|canara|motilal|invesco|tata|edelweiss|pgim|hsbc|bandhan|sundaram|bajaj|samco|idfc|baroda|bnp|mahindra|whiteoak|navi|mid cap|midcap|small cap|smallcap|multi cap|multicap|large mid|large midcap|focused|esg|gilt|liquid|hybrid|balanced advantage|international|overseas|global|us bluechip|us blue chip|us equity)\b/;
+
+  function norm(s) {
+    return prep(s).toLowerCase()
+      .replace(/(?<=[a-z0-9])[.\-'’](?=[a-z0-9])/g, "")   // e.l.s.s -> elss, lock-in -> lockin
+      .replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  // Windows of 1 to 3 words, joined without spaces, so "exit load" matches "exitload".
+  function windows(n) {
+    var t = n.split(" ").filter(Boolean), out = [];
+    for (var i = 0; i < t.length; i++) {
+      for (var k = 1; k <= 3 && i + k <= t.length; k++) out.push(t.slice(i, i + k).join(""));
+    }
+    return out;
+  }
+  function lev(a, b) {
+    var m = a.length, n = b.length, prev = [], cur, i, j;
+    for (j = 0; j <= n; j++) prev[j] = j;
+    for (i = 1; i <= m; i++) {
+      cur = [i];
+      for (j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = cur;
+    }
+    return prev[n];
+  }
+  // Typo tolerance: exact for terms up to 4 letters, 1 edit up to 8, 2 edits beyond.
+  function maxDist(term) { return term.length <= 4 ? 0 : term.length <= 8 ? 1 : 2; }
+  function hit(wins, term) {
+    var m = maxDist(term);
+    for (var i = 0; i < wins.length; i++) if (lev(wins[i], term) <= m) return true;
+    return false;
+  }
+
+  function sentenceCount(t) { return String(t).split(/(?<=[.!?])\s+/).filter(Boolean).length; }
+
+  function schemeName(sid) { return SCHEMES.filter(function (x) { return x.id === sid; })[0].name; }
+  function topicLabel(tid) { return TOPICS.filter(function (x) { return x.id === tid; })[0].label; }
+
+  // Every output item has the same shape. cat = category for non-fact items; sid/tid = scheme and topic for fact items.
+  function mk(kind, cat, text, srcKey, sid, tid) {
+    var src = srcKey ? SRC[srcKey] : null;
+    return {
+      kind: kind, cat: cat || null, text: text,
+      srcKey: srcKey || null, src: src, warning: warningFor(src),
+      sid: sid || null, tid: tid || null,
+      heading: sid ? schemeName(sid) + " · " + topicLabel(tid) : null
+    };
+  }
+
+  function answer(s, t) {
+    var f = FACTS[s] && FACTS[s][t];
+    if (!f) return mk("abstain", null, MSG.abstainDefault, null, s, t);
+    return mk(f.kind, null, f.text, f.src, s, t);
+  }
+
+  function run(raw) {
+    var q = String(raw == null ? "" : raw).trim();
+    if (!q) return [mk("notice", "empty", MSG.empty)];
+    if (q.length > 300) return [mk("notice", "tooLong", MSG.tooLong)];
+    if (isSensitive(q)) return [mk("privacy", "pii", MSG.privacy)];
+    var n = norm(q);
+    if (INJECT.test(n)) return [mk("refusal", "injection", MSG.injection)];
+    if (OPINION.some(function (r) { return r.test(n); })) return [mk("refusal", "opinion", MSG.opinion, "bluebook")];
+    if (COMPARE.test(n)) return [mk("refusal", "compare", MSG.compare)];
+    var noGains = n.replace(/capital ?gains?/g, " ");
+    if (RETURNS.some(function (r) { return r.test(noGains); })) return [mk("refusal", "returns", MSG.returns, "onePager")];
+    if (/\botp\b|one time (?:password|code)/.test(n)) return [mk("notice", "otp", MSG.otp)];
+    if (OTHER_SCHEME.test(n)) return [mk("notice", "otherScheme", MSG.otherScheme)];
+
+    var w = windows(n);
+    var schemes = SCHEMES.filter(function (s) { return s.terms.some(function (t) { return hit(w, t); }); });
+    var topics = TOPICS.filter(function (t) { return t.terms.some(function (x) { return hit(w, x); }); }).map(function (t) { return t.id; });
+    var out = [];
+    if (topics.indexOf("stmt") !== -1) {
+      out.push(mk("abstain", "stmt", MSG.stmt));
+      topics = topics.filter(function (t) { return t !== "stmt"; });
+    }
+    if (!topics.length) {
+      if (out.length) return out;
+      return [schemes.length ? mk("notice", "unsupported", MSG.unsupported) : mk("notice", "outOfScope", MSG.outOfScope)];
+    }
+    if (!schemes.length) return out.concat([mk("notice", "needScheme", MSG.needScheme)]);
+
+    // Every scheme x topic pair is answered; nothing is silently dropped.
+    var pairs = [];
+    schemes.forEach(function (s) { topics.forEach(function (t) { pairs.push([s.id, t]); }); });
+    if (pairs.length > 4) return out.concat([mk("notice", "tooMany", MSG.tooMany)]);
+    return out.concat(pairs.map(function (p) { return answer(p[0], p[1]); }));
+  }
+
+  function deepFreeze(o) {
+    Object.keys(o).forEach(function (k) { var v = o[k]; if (v && typeof v === "object") deepFreeze(v); });
+    return Object.freeze(o);
+  }
+  deepFreeze(SRC); deepFreeze(SCHEMES); deepFreeze(TOPICS); deepFreeze(FACTS); deepFreeze(MSG); deepFreeze(ALLOWED_HOSTS);
+
+  return { run: run, isSensitive: isSensitive, norm: norm, lev: lev, sentenceCount: sentenceCount, warningFor: warningFor,
+           SRC: SRC, SCHEMES: SCHEMES, TOPICS: TOPICS, FACTS: FACTS, MSG: MSG, ALLOWED_HOSTS: ALLOWED_HOSTS };
+})();
+</script>
+
+<script id="ui">
+(function () {
+  "use strict";
+  var chat = document.getElementById("chat");
+  var form = document.getElementById("f");
+  var input = document.getElementById("q");
+  var btn = document.getElementById("go");
+  var EX = ["What is the exit load of the Flexi Cap Fund?", "What is the lock-in period for ELSS Tax Saver?", "What is the minimum SIP for the Large Cap Fund?"];
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function userBubble(text) { chat.appendChild(el("div", "msg me", text)); }
+  function botBubble(it) {
+    var d = el("div", "msg bot");
+    if (it.heading) d.appendChild(el("div", "hd", it.heading));
+    d.appendChild(el("div", "", it.text));
+    if (it.src) {
+      var box = el("div", "src"), line = el("div", "", "Source: "), a = el("a", "", it.src.title);
+      a.href = it.src.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      line.appendChild(a);
+      box.appendChild(line);
+      box.appendChild(el("div", "", "Document date: " + it.src.docDate));
+      box.appendChild(el("div", "", "Last verified: " + (it.src.verified || "not verified") + " (" + it.src.status + ")"));
+      if (it.warning) box.appendChild(el("div", "warn", it.warning));
+      d.appendChild(box);
+    }
+    chat.appendChild(d);
+    d.scrollIntoView({ block: "nearest" });
+  }
+
+  function ask(raw) {
+    var q = String(raw || "");
+    if (!q.trim()) { botBubble(Core.run("")[0]); input.focus(); return; }
+    userBubble(Core.isSensitive(q) ? "[Message hidden: possible personal details]" : q);
+    var pending = el("div", "msg bot", "Checking approved facts…");
+    chat.appendChild(pending);
+    btn.disabled = true;
+    setTimeout(function () {
+      try {
+        var items = Core.run(q);
+        pending.remove();
+        items.forEach(botBubble);
+      } catch (err) {
+        pending.remove();
+        botBubble({ text: "Something went wrong while answering. Please try again.", heading: null, src: null, warning: null });
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    }, 150);
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = input.value;
+    input.value = "";
+    ask(v);
+  });
+  var ex = document.getElementById("ex");
+  EX.forEach(function (x) {
+    var b = el("button", "", x);
+    b.type = "button";
+    b.addEventListener("click", function () { ask(x); });
+    ex.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>
