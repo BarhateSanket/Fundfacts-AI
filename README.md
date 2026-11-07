@@ -36,7 +36,7 @@ FundFacts AI answers factual questions about selected ICICI Prudential mutual fu
 
 | Document | Description |
 |---|---|
-| [Sample Q&A](sample_qa.md) | Ten representative questions and expected assistant responses |
+| [Sample Q&A](docs/sample-qa.md) | Ten representative questions and expected assistant responses |
 | [QA Report](QA-REPORT.md) | Defects, fixes, test results, evaluation and known limitations |
 | [Submission Checklist](SUBMISSION.md) | Milestone requirement tracking |
 | [Disclaimer](disclaimer.md) | Educational and financial-use limitations |
