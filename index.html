@@ -61,15 +61,18 @@ var Core = (function () {
     onePager: { url: "https://www.icicipruamc.com/blob/knowledgecentre/product-enabler/9356-IPru%20Mutual%20Fund-Bluechip%20Fund%20Investor%20Mobile%20Vr-March%2025-linked.pdf", title: "ICICI Prudential Bluechip Fund investor one-pager", docDate: "March 2025 (data as on 31 Mar 2025)", asOf: "2025-03-31", verified: VERIFIED, status: "opened and read" },
     elss: { url: "https://www.icicipruamc.com/blob/knowledgecentre/factsheet-schemes/Schemes/1.%20Equity%20Schemes/ICICI%20Prudential%20ELSS%20-%20Tax%20Saver%20Fund.pdf", title: "ICICI Prudential ELSS Tax Saver Fund factsheet", docDate: "NAV as on 31 Aug 2026", asOf: "2026-08-31", verified: VERIFIED, status: "text read from search result" },
     amfi: { url: "https://portal.amfiindia.com/spages/SSD_3445.pdf", title: "AMFI scheme data sheet SSD 3445", docDate: "not stated in document", asOf: null, verified: VERIFIED, status: "text read from search result" },
+    sidElss: { url: "https://portal.amfiindia.com/spages/131.pdf", title: "ICICI Prudential ELSS Tax Saver Fund Scheme Information Document", docDate: "dated 31 October 2025 (riskometer as on 30 September 2025)", asOf: "2025-10-31", verified: VERIFIED, status: "opened and read" },
+    sidFlexi: { url: "https://www.sebi.gov.in/sebi_data/mutualfundfile/jun-2023/1685695819573.pdf", title: "ICICI Prudential Flexicap Fund Scheme Information Document (2023)", docDate: "dated 18 April 2023", asOf: "2023-04-18", verified: VERIFIED, status: "opened and read" },
+    amfiCas: { url: "https://www.amfiindia.com/online-center/download-cas", title: "AMFI: Download CAS (CAMS, KFintech and MFCentral)", docDate: "not stated on page", asOf: null, verified: VERIFIED, status: "opened and read" },
     ter: { url: "https://www.icicipruamc.com/about-us/financials-&-disclosures?currentTabFilter=Total+Expense+Ratio&subCatTabFilter=Total+Expense+Ratio", title: "ICICI Prudential AMC Total Expense Ratio disclosures page", docDate: "not verified", asOf: null, verified: null, status: "linked from factsheet, not opened" }
   };
-  var ALLOWED_HOSTS = ["www.icicipruamc.com", "portal.amfiindia.com"];
+  var ALLOWED_HOSTS = ["www.icicipruamc.com", "portal.amfiindia.com", "www.amfiindia.com", "www.sebi.gov.in"];
 
   // Warning shown with a source: undated, dated (older than STALE_DAYS), or never opened.
   function warningFor(src) {
     if (!src) return null;
     if (src.verified === null) return "This link was not opened, so its content is not verified.";
-    if (!src.asOf) return "Undated source: confirm this figure is current before relying on it.";
+    if (!src.asOf) return "Undated source: confirm the details are current before relying on them.";
     var days = Math.round((Date.parse(VERIFIED_ISO) - Date.parse(src.asOf)) / 86400000);
     return days > STALE_DAYS ? "Dated source: the data is " + days + " days older than the verification date, so figures may be out of date." : null;
   }
@@ -107,7 +110,7 @@ var Core = (function () {
     FLEXI: {
       exp: { kind: "abstain", text: "I can’t confirm this scheme’s expense ratio from an approved source yet, so I won’t give a figure. The AMC’s expense ratio disclosures page is linked below, but I haven’t opened it.", src: "ter" },
       exit: { kind: "fact", text: "Exit load is 1% of applicable NAV if redeemed within 1 month from allotment, and nil after 1 month.", src: "bluebook" },
-      sip: { kind: "abstain", text: "I can’t confirm this scheme’s minimum SIP from an approved source yet, so I won’t guess.", src: null },
+      sip: { kind: "fact", text: "The minimum SIP is ₹100, in multiples of ₹1, with at least six instalments, according to the scheme information document dated 18 April 2023.", src: "sidFlexi" },
       lock: { kind: "partial", text: "The Bluebook describes a 3-year statutory lock-in for the ELSS Tax Saver scheme. It does not describe a lock-in for the Flexi Cap Fund, so I can’t confirm this scheme’s lock-in terms from it.", src: "bluebook" },
       risk: { kind: "partial", text: "The Bluebook lists riskometers as on 30 September 2026, but this scheme’s level was not readable in the text I checked. Please check the AMC’s riskometer announcements for the current level.", src: "bluebook" },
       bench: { kind: "fact", text: "The benchmark is BSE 500 TRI.", src: "bluebook" },
@@ -117,7 +120,7 @@ var Core = (function () {
     ELSS: {
       exp: { kind: "fact", text: "The base expense ratio is 0.96% per annum for the Direct plan and 1.46% per annum for Other plans, as shown in the factsheet with NAV as on 31 August 2026.", src: "elss" },
       exit: { kind: "fact", text: "Exit load is nil, according to the Bluebook. The scheme also has a statutory lock-in of 3 years.", src: "bluebook" },
-      sip: { kind: "abstain", text: "I can’t confirm this scheme’s minimum SIP from an approved source yet, so I won’t guess.", src: null },
+      sip: { kind: "fact", text: "The minimum SIP is ₹500, in multiples of ₹500, with at least six instalments, according to the scheme information document dated 31 October 2025.", src: "sidElss" },
       lock: { kind: "fact", text: "The scheme has a statutory lock-in of 3 years. The Bluebook says its tax benefit under Section 80C applies to investors who opt for the old tax regime.", src: "bluebook" },
       risk: { kind: "partial", text: "The Bluebook lists riskometers as on 30 September 2026, but this scheme’s level was not readable in the text I checked. Please check the AMC’s riskometer announcements for the current level.", src: "bluebook" },
       bench: { kind: "fact", text: "The benchmark is Nifty 500 TRI.", src: "bluebook" },
@@ -140,7 +143,7 @@ var Core = (function () {
     unsupported: "I don’t have an approved answer for that. I can answer about: expense ratio, exit load, minimum SIP, lock-in period, riskometer, benchmark, inception date and fund managers.",
     outOfScope: "I can only answer about the ICICI Prudential Large Cap, Flexi Cap and ELSS Tax Saver funds, and the details listed above.",
     tooMany: "That’s too many scheme and detail combinations at once. Please ask about up to four at a time.",
-    stmt: "I can’t confirm statement-download steps from an approved source, so I won’t give them.",
+    stmtAnswer: "AMFI’s download page describes the Consolidated Account Statement (CAS), which shows holdings across all mutual funds. It can be requested from CAMS or KFintech, or viewed and downloaded on MFCentral, but the page does not describe a capital-gains statement.",
     abstainDefault: "I can’t verify that from an approved source, so I won’t guess."
   };
 
@@ -257,7 +260,7 @@ var Core = (function () {
     var topics = TOPICS.filter(function (t) { return t.terms.some(function (x) { return hit(w, x); }); }).map(function (t) { return t.id; });
     var out = [];
     if (topics.indexOf("stmt") !== -1) {
-      out.push(mk("abstain", "stmt", MSG.stmt));
+      out.push(mk("partial", "stmt", MSG.stmtAnswer, "amfiCas"));
       topics = topics.filter(function (t) { return t !== "stmt"; });
     }
     if (!topics.length) {
@@ -309,7 +312,7 @@ var Core = (function () {
       a.href = it.src.url; a.target = "_blank"; a.rel = "noopener noreferrer";
       line.appendChild(a);
       box.appendChild(line);
-      box.appendChild(el("div", "", "Document date: " + it.src.docDate));
+      box.appendChild(el("div", "", "Last updated from sources (document date): " + it.src.docDate));
       box.appendChild(el("div", "", "Last verified: " + (it.src.verified || "not verified") + " (" + it.src.status + ")"));
       if (it.warning) box.appendChild(el("div", "warn", it.warning));
       d.appendChild(box);
